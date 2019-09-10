@@ -1,6 +1,6 @@
 import React from 'react';
 import '../App.css';
-import { Box, Button, Container, FormControl, InputLabel, makeStyles, MenuItem, Select } from '@material-ui/core';
+import { Box, Button, Checkbox, Container, FormControl, FormControlLabel, Input, InputLabel, makeStyles, MenuItem, Select, Slider, Typography } from '@material-ui/core';
 
 //https://material-ui.com/
 
@@ -8,16 +8,40 @@ const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
         flexWrap: 'wrap',
+        width: 400,
     },
     formControl: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(3),
         minWidth: 200,
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+    input: {
+        width: 42,
+    },
 }));
 
+function CheckboxLabel() {
+    const [state, setState] = React.useState({
+        checked: true
+    });
+
+    const handleChange = name => event => {
+        setState({ ...state, [name]: event.target.checked });
+    };
+
+    return (
+        <FormControlLabel
+            control={
+                <Checkbox
+                    onChange={handleChange("checkedG")}
+                />
+            }
+            label="Is misty a thot y/n"
+        />
+    );
+}
 
 function SimpleSelect() {
     const classes = useStyles();
@@ -26,10 +50,6 @@ function SimpleSelect() {
     });
 
     const inputLabel = React.useRef(null);
-    const [labelWidth, setLabelWidth] = React.useState(0);
-    React.useEffect(() => {
-        setLabelWidth(inputLabel.current.offsetWidth);
-    }, []);
 
     function handleChange(event) {
         setValues(oldValues => ({
@@ -44,11 +64,10 @@ function SimpleSelect() {
             <FormControl required variant="outlined" className={classes.formControl}>
                 <InputLabel ref={inputLabel} htmlFor="outlined-age-simple">
                     State of Residence
-          </InputLabel>
+                </InputLabel>
                 <Select
                     value={values.age}
                     onChange={handleChange}
-                    labelWidth={labelWidth}
                     inputProps={{
                         name: 'age',
                         id: 'outlined-age-simple',
@@ -64,6 +83,56 @@ function SimpleSelect() {
             </FormControl>
 
         </form>
+    );
+}
+
+function InputSlider() {
+    const classes = useStyles();
+    const [value, setValue] = React.useState(100000);
+
+    const handleSliderChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
+    const handleInputChange = event => {
+        setValue(event.target.value === '' ? '' : Number(event.target.value));
+    };
+
+    const handleBlur = () => {
+        if (value < 0) {
+            setValue(0);
+        } else if (value > 100000) {
+            setValue(100000);
+        }
+    };
+
+    return (
+        <div className={classes.root}>
+            <Typography id="input-slider" gutterBottom>
+                Expected Salary
+          </Typography>
+
+            <Slider
+                value={typeof value === 'number' ? value : 0}
+                onChange={handleSliderChange}
+                aria-labelledby="input-slider"
+            />
+
+            <Input
+                className={classes.input}
+                value={value}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                inputProps={{
+                    step: 1000,
+                    min: 0,
+                    max: 100000,
+                    type: 'number',
+                    'aria-labelledby': 'input-slider',
+                }}
+            />
+
+        </div>
     );
 }
 export class App extends React.Component {
@@ -96,6 +165,8 @@ export class App extends React.Component {
                 <Container fixed>
                     Help I'm trapped in a fixed width container
                     <SimpleSelect />
+                    <InputSlider />
+                    <CheckboxLabel />
                 </Container>
             </body>
 
