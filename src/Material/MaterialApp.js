@@ -1,6 +1,6 @@
 import React from 'react';
 import '../App.css';
-import { Box, Button, Checkbox, Container, FormControl, FormControlLabel, Input, InputLabel, makeStyles, MenuItem, Select, Slider, Typography } from '@material-ui/core';
+import { Box, Button, Checkbox, Container, FormControl, FormControlLabel, Grid, Input, InputLabel, makeStyles, MenuItem, Select, Slider, Typography } from '@material-ui/core';
 
 //https://material-ui.com/
 
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-function CheckboxLabel() {
+function CheckboxLabel(props) {
     const [state, setState] = React.useState({
         checked: true
     });
@@ -38,15 +38,15 @@ function CheckboxLabel() {
                     onChange={handleChange("checkedG")}
                 />
             }
-            label="Is misty a thot y/n"
+            label={props.label}
         />
     );
 }
 
-function SimpleSelect() {
+function SimpleSelect(props) {
     const classes = useStyles();
     const [values, setValues] = React.useState({
-        age: '',
+        name: '',
     });
 
     const inputLabel = React.useRef(null);
@@ -58,6 +58,11 @@ function SimpleSelect() {
         }));
     }
 
+    const vals = props.values;
+    const items = vals.map((val) =>
+        <MenuItem value={val}>{val}</MenuItem>
+    );
+
     return (
         <form className={classes.root} autoComplete="off">
 
@@ -66,19 +71,14 @@ function SimpleSelect() {
                     State of Residence
                 </InputLabel>
                 <Select
-                    value={values.age}
+                    value={values.name}
                     onChange={handleChange}
                     inputProps={{
-                        name: 'age',
-                        id: 'outlined-age-simple',
+                        name: 'name',
+                        id: 'name',
                     }}
                 >
-                    <MenuItem value="">
-                        <em>None</em>
-                    </MenuItem>
-                    <MenuItem value={'Cl'}>Cleveland</MenuItem>
-                    <MenuItem value={'Ci'}>Cincinnati</MenuItem>
-                    <MenuItem value={'Co'}>Columbus</MenuItem>
+                    {items}
                 </Select>
             </FormControl>
 
@@ -86,9 +86,9 @@ function SimpleSelect() {
     );
 }
 
-function InputSlider() {
+function InputSlider(props) {
     const classes = useStyles();
-    const [value, setValue] = React.useState(100000);
+    const [value, setValue] = React.useState(50000);
 
     const handleSliderChange = (event, newValue) => {
         setValue(newValue);
@@ -101,54 +101,50 @@ function InputSlider() {
     const handleBlur = () => {
         if (value < 0) {
             setValue(0);
-        } else if (value > 100000) {
-            setValue(100000);
+        } else if (value > 150000) {
+            setValue(150000);
         }
     };
 
     return (
         <div className={classes.root}>
             <Typography id="input-slider" gutterBottom>
-                Expected Salary
-          </Typography>
-
+                {props.title}
+            </Typography>
             <Slider
                 value={typeof value === 'number' ? value : 0}
+                min={props.min}
+                max={props.max}
                 onChange={handleSliderChange}
                 aria-labelledby="input-slider"
             />
-
             <Input
-                className={classes.input}
+                // className={classes.input}
                 value={value}
+                width={100}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 inputProps={{
                     step: 1000,
-                    min: 0,
-                    max: 100000,
+                    min: props.min,
+                    max: props.max,
                     type: 'number',
                     'aria-labelledby': 'input-slider',
                 }}
             />
-
         </div>
     );
 }
 export class App extends React.Component {
 
-    suggestions = [
-        { label: 'Cleveland' },
-        { label: 'Columbus' },
-        { label: 'Cincinnati' },
-        { label: 'Akron' }
+    cities = ['Akron', 'Cleveland', 'Cincinnati', 'Columbus']
+    // classes = useStyles()
 
-    ]
     render() {
 
         return (
             <body>
-                <Box m={1}>
+                <Grid container spacing={2}>
                     <Button>
                         Transparent button
                     </Button>
@@ -161,13 +157,14 @@ export class App extends React.Component {
                     <Button variant="outlined" color="default">
                         outlines!
                     </Button>
-                </Box>
-                <Container fixed>
-                    Help I'm trapped in a fixed width container
-                    <SimpleSelect />
-                    <InputSlider />
-                    <CheckboxLabel />
-                </Container>
+                    <Container fixed>
+                        Help I'm trapped in a fixed width container
+                        <SimpleSelect values={this.cities} />
+                        <InputSlider title="Expected Salary" min={0} max={150000} />
+                        <CheckboxLabel label="Is misty a thot y/n" />
+                    </Container>
+                </Grid>
+
             </body>
 
 
